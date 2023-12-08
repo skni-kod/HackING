@@ -1,6 +1,6 @@
 import random
 
-class Labirynth:
+class Labyrinth:
     def __init__(self, width, height, start_position, exit_position):
         self.width = width
         self.height = height
@@ -9,7 +9,9 @@ class Labirynth:
         self.generate_grid()
 
     def generate_grid(self):
-        self.grid = [[1] * self.width for _ in range(self.height)]
+        # tworzenie macierzy(labiryntu) wypełnionej jedynkami(sciany)
+        # przy pomocy algorytmu DFS tworzy scierzke z pozycji startowej do wyjscia(droga jest zapisywana jako 0 w macierzy)
+        self.grid = [[1] * self.width for i in range(self.height)]
         self.grid[self.width - 2][self.height - 1] = 0
         self.grid[1][0] = 0
         stack = []

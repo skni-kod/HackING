@@ -1,28 +1,28 @@
 import tkinter as tk
-from labyrinth import Labirynth
+from labyrinth import Labyrinth
 
-class LabirynthApp:
-    def __init__(self, master, labirynth):
+class LabyrinthApp:
+    def __init__(self, master, labyrinth):
         self.master = master
-        self.labirynth = labirynth
-        self.current_position = labirynth.start_position
+        self.labyrinth = labyrinth
+        self.current_position = labyrinth.start_position
         self.order = []
-        self.canvas = tk.Canvas(master, width=labirynth.width * 30, height=labirynth.height * 30)
+        self.canvas = tk.Canvas(master, width=labyrinth.width * 30, height=labyrinth.height * 30)
         self.canvas.pack()
-        self.draw_labirynth()
+        self.draw_labyrinth()
         self.draw_player()
-
+        # sprawdzanie który przycisk został wcisniety i wykonanie akcji przypisaniej do niego
         master.bind("<Up>", self.move_up)
         master.bind("<Down>", self.move_down)
         master.bind("<Left>", self.move_left)
         master.bind("<Right>", self.move_right)
 
-    def draw_labirynth(self):
-        for i in range(self.labirynth.height):
-            for j in range(self.labirynth.width):
+    def draw_labyrinth(self):
+        for i in range(self.labyrinth.height):
+            for j in range(self.labyrinth.width):
                 x1, y1 = j * 30, i * 30
                 x2, y2 = x1 + 30, y1 + 30
-                if self.labirynth.grid[i][j] == 1:
+                if self.labyrinth.grid[i][j] == 1:
                     self.canvas.create_rectangle(x1, y1, x2, y2, fill="black")
 
     def draw_player(self):
@@ -52,27 +52,27 @@ class LabirynthApp:
         self.move(new_position)
 
     def move(self, new_position):
-        if self.labirynth.is_valid_move(new_position):
+        if self.labyrinth.is_valid_move(new_position):
             x, y = self.current_position
             new_x, new_y = new_position
             self.canvas.move(self.player, (new_x - x) * 30, (new_y - y) * 30)
             self.current_position = new_position
-            if self.labirynth.is_exit(new_position):
-                file = open("test.txt", 'a')
+            if self.labyrinth.is_exit(new_position):
+                file = open("droga.txt", 'a')
                 for n in self.order:
                     file.write(n + " ")
                 file.write("end\n")
                 file.close()
-                self.load_new_labirynth()
+                self.load_new_labyrinth()
 
-    def load_new_labirynth(self):
+    def load_new_labyrinth(self):
         self.canvas.delete("all")
         self.order.clear()
-        self.labirynth = self.generate_new_labirynth()
-        self.current_position = self.labirynth.start_position
-        self.draw_labirynth()
+        self.labyrinth = self.generate_new_labyrinth()
+        self.current_position = self.labyrinth.start_position
+        self.draw_labyrinth()
         self.draw_player()
 
 
-    def generate_new_labirynth(self):
-        return Labirynth(17, 17, (1, 1), (16, 15))
+    def generate_new_labyrinth(self):
+        return Labyrinth(17, 17, (1, 1), (16, 15))
