@@ -1,4 +1,0 @@
-**Qtable**
-
-W kontekście uczenia przez wzmacnianie, Q-value dla danej pary (stan, akcja) mówi nam, jaka jest przewidywana suma nagród, jaką agent może osiągnąć, podejmując tę akcję w danym stanie.
-Innymi słowy, jest to miara, jak dobrze dana akcja sprawdza się w danym stanie.
