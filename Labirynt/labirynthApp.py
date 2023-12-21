@@ -58,11 +58,10 @@ class LabyrinthApp:
             self.canvas.move(self.player, (new_x - x) * 30, (new_y - y) * 30)
             self.current_position = new_position
             if self.labyrinth.is_exit(new_position):
-                file = open("droga.txt", 'a')
-                for n in self.order:
-                    file.write(n + " ")
-                file.write("end\n")
-                file.close()
+                with open("droga.txt", 'a') as file:
+                    for n in self.order:
+                        file.write(n + " ")
+                    file.write("end\n")
                 self.load_new_labyrinth()
 
     def load_new_labyrinth(self):
