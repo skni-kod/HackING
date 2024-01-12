@@ -17,16 +17,15 @@ data = [
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
 
 class Layer:
-    def __init__(self, n_inputs, n_neurons, startXY=data[1][1]):  # wielkosc tablicy podanej oraz ilosc neuronow
+    def __init__(self, n_inputs, n_neurons):  # wielkosc tablicy podanej oraz ilosc neuronow
         self.output = None
-        self.startXY = startXY
         self.biases = np.zeros((1, n_neurons))
         self.weights = 0.1 * np.random.randn(n_inputs, n_neurons)  # losowe wagi w zależności od ilości wejść i neuronów
         self.expected_outputs = [[1, 0, 0, 0],
@@ -57,11 +56,14 @@ class Layer:
         choose_index = []
         for lista in self.output:
             index = -1
-            for i in range(len(lista)-1):
-                if(lista[i] > lista[i+1]):
+            for i in range(len(lista) - 1):
+                if lista[i] > lista[i + 1]:
                     index = i
             choose_index.append(index)
         return choose_index
+
+    def sigmoid_derative(self, x):
+        return x * (1 - x)
 
     def make_move(self):
         move_index = max(Counter(self.choose_action()), key=Counter(self.choose_action()).get)
@@ -76,17 +78,38 @@ class Layer:
 
         return move_index
 
-    def backward_propagation(self):
-        pass
+    def backward_propagation(self, learning_rate):
+        """
+        TODO:
+            1) oblicz gradienty dla funkcji kosztu (MSE)
+            2) Aktualizuj wagi dla warstwy wyjściowej
+            3) Propagacja wsteczna dla warstw ukrytych(jeżeli istnieją)
+            4) Aktualizuj wagi dla warst ukrytych
+        """
+        # 1 gradienty:
+        output_err = np.array(self.choose_action()) - np.array(self.expected_outputs)
+        output_delta = output_err * self.sigmoid_derative(self.output)
+
+        # 2 wagi i biasy:
+        self.weights -= learning_rate * np.dot(self.output.T, output_delta)
+        self.biases -= learning_rate * np.sum(output_delta, axis=0, keepdims=True)
+
+        # 3 propagacja wsteczna:
+        hidden_err = np.dot(output_delta, self.weights.T)
+        hidden_delta = hidden_err * self.sigmoid_derative(self.output)
+
+        # 4:
+        self.weights -= learning_rate * np.dot(self.output.T, hidden_delta)
+        self.biases -= learning_rate * np.sum(hidden_delta, axis=0, keepdims=True)
+
+    def learning_loop(self, epochs, learning_rate):
+        for epoch in range(epochs):
+            self.forward_propagation(data)
+            self.backward_propagation(learning_rate=learning_rate)
+            if epoch % 10 == 0:
+                error = self.mean_squared_error()
+                print(f'Epoch: {epoch} , Błąd: {error}\n')
 
 
-layer1 = Layer(len(data[0]), 17)
-layer1.forward_propagation(data)
-layer2 = Layer(len(layer1.output), 4)
-layer2.forward_propagation(layer1.output)
-layer2.softmax(layer2.output)
-
-print(layer2.output)
-print(layer2.choose_action())
-print(layer2.make_move())
-
+layer1 = Layer(len(data), 17)
+layer1.learning_loop(epochs=100, learning_rate=0.1)
